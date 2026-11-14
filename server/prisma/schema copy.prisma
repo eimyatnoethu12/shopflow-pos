@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String    @id
+  tenantId  String
+  name      String
+  createdAt DateTime  @default(now())
+  Tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  Product   Product[]
+
+  @@unique([tenantId, name])
+}
+
+model Customer {
+  id        String   @id
+  tenantId  String
+  name      String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  Tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  Order     Order[]
+}
+
+model Expense {
+  id          String   @id
+  tenantId    String
+  title       String
+  amount      Decimal  @db.Decimal(12, 2)
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model InventoryMovement {
+  id             String         @id
+  variantId      String
+  type           String
+  quantity       Int
+  note           String?
+  createdAt      DateTime       @default(now())
+  ProductVariant ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model Order {
+  id              String      @id
+  tenantId        String
+  customerId      String?
+  orderNumber     String
+  subtotal        Decimal     @default(0) @db.Decimal(12, 2)
+  discount        Decimal     @default(0) @db.Decimal(12, 2)
+  deliveryFee     Decimal     @default(0) @db.Decimal(12, 2)
+  total           Decimal     @default(0) @db.Decimal(12, 2)
+  status          String      @default("pending")
+  paymentStatus   String      @default("unpaid")
+  paymentMethod   String?
+  shippingAddress String?
+  createdAt       DateTime    @default(now())
+  Customer        Customer?   @relation(fields: [customerId], references: [id])
+  Tenant          Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  OrderItem       OrderItem[]
+
+  @@unique([tenantId, orderNumber])
+}
+
+model OrderItem {
+  id             String         @id
+  orderId        String
+  variantId      String
+  productName    String
+  variantName    String?
+  quantity       Int
+  unitPrice      Decimal        @db.Decimal(12, 2)
+  unitCost       Decimal        @default(0) @db.Decimal(12, 2)
+  total          Decimal        @db.Decimal(12, 2)
+  Order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  ProductVariant ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model Plan {
+  id           String  @id
+  name         String
+  price        Decimal @db.Decimal(12, 2)
+  durationDays Int     @default(30)
+  isActive     Boolean @default(true)
+}
+
+model Product {
+  id             String           @id
+  tenantId       String
+  categoryId     String?
+  name           String
+  sku            String
+  description    String?
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  Category       Category?        @relation(fields: [categoryId], references: [id])
+  Tenant         Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ProductVariant ProductVariant[]
+
+  @@unique([tenantId, sku])
+}
+
+model ProductVariant {
+  id                String              @id
+  productId         String
+  name              String
+  sku               String              @unique
+  costPrice         Decimal             @default(0) @db.Decimal(12, 2)
+  sellingPrice      Decimal             @default(0) @db.Decimal(12, 2)
+  stock             Int                 @default(0)
+  InventoryMovement InventoryMovement[]
+  OrderItem         OrderItem[]
+  Product           Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Tenant {
+  id         String       @id
+  name       String
+  slug       String       @unique
+  phone      String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  Category   Category[]
+  Customer   Customer[]
+  Order      Order[]
+  Product    Product[]
+  TenantUser TenantUser[]
+}
+
+model TenantUser {
+  id       String @id
+  tenantId String
+  userId   String
+  role     String @default("owner")
+  Tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  User     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+}
+
+model User {
+  id         String       @id
+  name       String
+  email      String       @unique
+  password   String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime
+  TenantUser TenantUser[]
+}

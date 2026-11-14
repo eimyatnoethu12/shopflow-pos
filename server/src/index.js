@@ -1,0 +1,26 @@
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import authRoutes from './routes/auth.js';
+import shopRoutes from './routes/shop.js';
+import dashboardRoutes from './routes/dashboard.js';
+import { requireAuth } from './middleware/auth.js';
+import { errorHandler, notFound } from './middleware/errors.js';
+
+
+if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is required');
+const app = express();
+app.use(helmet());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',') || 'http://localhost:5173' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(morgan('dev'));
+app.get('/api/health', (req, res) => res.json({ ok: true, service: 'shopflow-api' }));
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api', requireAuth, shopRoutes);
+app.use(notFound);
+app.use(errorHandler);
+const port = process.env.PORT || 4000;
+app.listen(port, () => console.log(`ShopFlow API listening on ${port}`));
