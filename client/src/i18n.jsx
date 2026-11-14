@@ -1,8 +1,225 @@
 import React, { createContext, useContext, useState } from 'react';
+
 const words = {
-  my: { dashboard:'ခြုံငုံသုံးသပ်ချက်', products:'ကုန်ပစ္စည်းများ', orders:'အော်ဒါများ', customers:'ဖောက်သည်များ', inventory:'ကုန်လက်ကျန်', reports:'အစီရင်ခံစာများ', subscription:'အသင်းဝင်အစီအစဉ်', admin:'စီမံခန့်ခွဲသူ', sales:'ရောင်းအား', totalOrders:'အော်ဒါစုစုပေါင်း', totalProducts:'ကုန်ပစ္စည်းစုစုပေါင်း', customersCount:'ဖောက်သည်စုစုပေါင်း', lowStock:'လက်ကျန်နည်း', recentOrders:'နောက်ဆုံးအော်ဒါများ', orderNo:'အော်ဒါနံပါတ်', customer:'ဖောက်သည်', total:'စုစုပေါင်း', status:'အခြေအနေ', date:'ရက်စွဲ', addProduct:'ကုန်ပစ္စည်းထည့်ရန်', addCustomer:'ဖောက်သည်ထည့်ရန်', name:'အမည်', price:'ရောင်းဈေး', stock:'လက်ကျန်', save:'သိမ်းမည်', cancel:'ပယ်ဖျက်မည်', search:'ရှာဖွေရန်', noData:'ဒေတာမရှိသေးပါ', logout:'ထွက်ရန်', login:'ဝင်ရန်', email:'အီးမေးလ်', password:'စကားဝှက်', shopName:'ဆိုင်အမည်', ownerName:'ပိုင်ရှင်အမည်', createAccount:'အကောင့်ဖွင့်ရန်', welcome:'ကြိုဆိုပါတယ်', loading:'ခဏစောင့်ပါ…', error:'အမှား', currency:'ကျပ်' },
-  en: { dashboard:'Dashboard', products:'Products', orders:'Orders', customers:'Customers', inventory:'Inventory', reports:'Reports', subscription:'Subscription', admin:'Admin', sales:'Sales', totalOrders:'Total orders', totalProducts:'Total products', customersCount:'Customers', lowStock:'Low stock', recentOrders:'Recent orders', orderNo:'Order No.', customer:'Customer', total:'Total', status:'Status', date:'Date', addProduct:'Add product', addCustomer:'Add customer', name:'Name', price:'Selling price', stock:'Stock', save:'Save', cancel:'Cancel', search:'Search', noData:'No data yet', logout:'Logout', login:'Login', email:'Email', password:'Password', shopName:'Shop name', ownerName:'Owner name', createAccount:'Create account', welcome:'Welcome', loading:'Loading…', error:'Error', currency:'MMK' }
+  my: {
+    // Navigation & Common
+    platformOwner: 'ပလက်ဖောင်းပိုင်ရှင်',
+    superAdmin: 'Super Admin စီမံခန့်ခွဲသူ',
+    shopAdmin: 'ဆိုင်စီမံခန့်ခွဲသူ',
+    switchToSuperAdmin: 'Super Admin သို့ပြောင်းရန်',
+    switchToShopAdmin: 'ဆိုင်သို့သွားရန်',
+    dashboard: 'ခြုံငုံသုံးသပ်ချက်',
+    posSales: 'POS အရောင်းကောင်တာ',
+    products: 'ကုန်ပစ္စည်းများ',
+    categories: 'အမျိုးအစားများ',
+    orders: 'အော်ဒါများ',
+    customers: 'ဖောက်သည်များ',
+    inventory: 'ကုန်လက်ကျန်',
+    expenses: 'အသုံးစရိတ်များ',
+    reports: 'အစီရင်ခံစာများ',
+    branches: 'ဆိုင်ခွဲများ',
+    staff: 'ဝန်ထမ်းများနှင့် လုပ်ပိုင်ခွင့်',
+    subscription: 'အသင်းဝင်အစီအစဉ်',
+    allShops: 'ဆိုင်များအားလုံး',
+    subscriptionsAndSlips: 'ငွေပေးချေမှုနှင့် Slip စစ်ဆေးရန်',
+    plansManagement: 'Plan များ စီမံရန်',
+    platformUsers: 'User များ စီမံရန်',
+    logout: 'ထွက်ရန်',
+    login: 'ဝင်ရန်',
+    createAccount: 'အကောင့်ဖွင့်ရန်',
+    email: 'အီးမေးလ်',
+    password: 'စကားဝှက်',
+    name: 'အမည်',
+    shopName: 'ဆိုင်အမည်',
+    ownerName: 'ပိုင်ရှင်အမည်',
+    phone: 'ဖုန်းနံပါတ်',
+    address: 'လိပ်စာ',
+    save: 'သိမ်းမည်',
+    cancel: 'ပယ်ဖျက်မည်',
+    delete: 'ဖျက်မည်',
+    edit: 'ပြင်ဆင်မည်',
+    actions: 'လုပ်ဆောင်ချက်',
+    search: 'ရှာဖွေရန်',
+    status: 'အခြေအနေ',
+    active: 'ပုံမှန် (Active)',
+    suspended: 'ရပ်ဆိုင်းထား (Suspended)',
+    pending: 'စောင့်ဆိုင်းဆဲ (Pending)',
+    paid: 'ပေးချေပြီး (Paid)',
+    rejected: 'ငြင်းပယ်သည် (Rejected)',
+    currency: 'ကျပ်',
+    loading: 'ခဏစောင့်ပါ…',
+    noData: 'ဒေတာမရှိသေးပါ',
+    date: 'ရက်စွဲ',
+    total: 'စုစုပေါင်း',
+    all: 'အားလုံး',
+
+    // Dashboard metrics
+    todaySales: 'ယနေ့ရောင်းအား',
+    monthSales: 'ယခုလရောင်းအား',
+    totalOrders: 'စုစုပေါင်း အော်ဒါ',
+    totalProducts: 'ကုန်ပစ္စည်း အမျိုးအစား',
+    totalCustomers: 'ဖောက်သည် စုစုပေါင်း',
+    totalStock: 'စုစုပေါင်း လက်ကျန်အရေအတွက်',
+    lowStockAlert: 'လက်ကျန်နည်းနေသော ပစ္စည်း',
+    monthlyExpenses: 'ယခုလ အသုံးစရိတ်',
+    netProfit: 'အသားတင်အမြတ် (ခန့်မှန်းခြေ)',
+    salesTrend: '၇ ရက် ရောင်းအားလမ်းကြောင်း',
+    topProducts: 'အရောင်းရဆုံး ပစ္စည်းများ',
+    recentOrders: 'နောက်ဆုံးရ အော်ဒါများ',
+    recentMovements: 'နောက်ဆုံး ကုန်ပစ္စည်း အဝင်/အထွက်',
+
+    // Products & POS
+    addProduct: 'ကုန်ပစ္စည်းအသစ်ထည့်ရန်',
+    editProduct: 'ကုန်ပစ္စည်းပြင်ဆင်ရန်',
+    productName: 'ပစ္စည်းအမည်',
+    sku: 'SKU / ဘားကုဒ်',
+    costPrice: 'အရင်းဈေး (Cost)',
+    sellingPrice: 'ရောင်းဈေး (Price)',
+    initialStock: 'စတင်လက်ကျန် (Stock)',
+    category: 'အမျိုးအစား',
+    description: 'အသေးစိတ် ဖော်ပြချက်',
+    cart: 'ဈေးဝယ်လှည်း',
+    walkInCustomer: 'Walk-in ဖောက်သည်',
+    discount: 'လျှော့ဈေး',
+    deliveryFee: 'ပို့ဆောင်ခ',
+    paymentMethod: 'ငွေပေးချေမှုပုံစံ',
+    completeSale: 'အရောင်းသိမ်းဆည်းမည်',
+    receipt: 'အရောင်းပြေစာ',
+
+    // Super Admin specifics
+    totalPlatformRevenue: 'ပလက်ဖောင်း စုစုပေါင်းဝင်ငွေ',
+    totalShops: 'စုစုပေါင်း ဆိုင်အရေအတွက်',
+    activeShops: 'ဖွင့်ထားသော ဆိုင်များ',
+    suspendedShops: 'ရပ်ဆိုင်းထားသော ဆိုင်များ',
+    pendingPaymentSlips: 'စစ်ဆေးရန် ကျန်ရှိသော Payment Slip များ',
+    approvePayment: 'အတည်ပြုမည် (Approve)',
+    rejectPayment: 'ငြင်းပယ်မည် (Reject)',
+    activateShop: 'ဆိုင်ဖွင့်မည်',
+    suspendShop: 'ဆိုင်ရပ်ဆိုင်းမည်',
+    planPrice: 'Plan ဈေးနှုန်း (MMK)',
+    planDuration: 'သက်တမ်း (ရက်ပေါင်း)',
+    addPlan: 'Plan အသစ်ဖွင့်ရန်',
+    shopDetails: 'ဆိုင်အချက်အလက် အသေးစိတ်'
+  },
+  en: {
+    // Navigation & Common
+    platformOwner: 'Platform Owner',
+    superAdmin: 'Super Admin',
+    shopAdmin: 'Shop Admin',
+    switchToSuperAdmin: 'Go to Super Admin',
+    switchToShopAdmin: 'Switch to Shop Admin',
+    dashboard: 'Dashboard',
+    posSales: 'POS Register',
+    products: 'Products',
+    categories: 'Categories',
+    orders: 'Orders',
+    customers: 'Customers',
+    inventory: 'Inventory',
+    expenses: 'Expenses',
+    reports: 'Reports',
+    branches: 'Branches',
+    staff: 'Staff & Roles',
+    subscription: 'Subscription',
+    allShops: 'All Shops',
+    subscriptionsAndSlips: 'Payments & Slips',
+    plansManagement: 'Manage Plans',
+    platformUsers: 'Manage Users',
+    logout: 'Logout',
+    login: 'Login',
+    createAccount: 'Create Account',
+    email: 'Email',
+    password: 'Password',
+    name: 'Name',
+    shopName: 'Shop Name',
+    ownerName: 'Owner Name',
+    phone: 'Phone',
+    address: 'Address',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    edit: 'Edit',
+    actions: 'Actions',
+    search: 'Search',
+    status: 'Status',
+    active: 'Active',
+    suspended: 'Suspended',
+    pending: 'Pending',
+    paid: 'Paid',
+    rejected: 'Rejected',
+    currency: 'MMK',
+    loading: 'Loading…',
+    noData: 'No data yet',
+    date: 'Date',
+    total: 'Total',
+    all: 'All',
+
+    // Dashboard metrics
+    todaySales: "Today's Sales",
+    monthSales: 'This Month Sales',
+    totalOrders: 'Total Orders',
+    totalProducts: 'Total Products',
+    totalCustomers: 'Total Customers',
+    totalStock: 'Total Stock Units',
+    lowStockAlert: 'Low Stock Alert',
+    monthlyExpenses: 'Monthly Expenses',
+    netProfit: 'Estimated Net Profit',
+    salesTrend: '7-Day Sales Trend',
+    topProducts: 'Top Selling Products',
+    recentOrders: 'Recent Orders',
+    recentMovements: 'Recent Inventory Movements',
+
+    // Products & POS
+    addProduct: 'Add Product',
+    editProduct: 'Edit Product',
+    productName: 'Product Name',
+    sku: 'SKU / Barcode',
+    costPrice: 'Cost Price',
+    sellingPrice: 'Selling Price',
+    initialStock: 'Initial Stock',
+    category: 'Category',
+    description: 'Description',
+    cart: 'Cart',
+    walkInCustomer: 'Walk-in Customer',
+    discount: 'Discount',
+    deliveryFee: 'Delivery Fee',
+    paymentMethod: 'Payment Method',
+    completeSale: 'Complete Sale',
+    receipt: 'Sale Receipt',
+
+    // Super Admin specifics
+    totalPlatformRevenue: 'Total Platform Revenue',
+    totalShops: 'Total Shops',
+    activeShops: 'Active Shops',
+    suspendedShops: 'Suspended Shops',
+    pendingPaymentSlips: 'Pending Payment Slips',
+    approvePayment: 'Approve Payment',
+    rejectPayment: 'Reject',
+    activateShop: 'Activate Shop',
+    suspendShop: 'Suspend Shop',
+    planPrice: 'Plan Price (MMK)',
+    planDuration: 'Duration (Days)',
+    addPlan: 'Create Plan',
+    shopDetails: 'Shop Details'
+  }
 };
+
 const Ctx = createContext(null);
-export function I18nProvider({children}) { const [lang,setLang]=useState(localStorage.getItem('shopflow_lang')||'my'); const t=(key)=>words[lang]?.[key]||words.en[key]||key; const change=(v)=>{localStorage.setItem('shopflow_lang',v);setLang(v)}; return <Ctx.Provider value={{lang,setLang:change,t}}>{children}</Ctx.Provider>; }
-export const useI18n=()=>useContext(Ctx);
+
+export function I18nProvider({ children }) {
+  const [lang, setLang] = useState(localStorage.getItem('shopflow_lang') || 'my');
+
+  const t = (key) => words[lang]?.[key] || words.en[key] || key;
+
+  const change = (v) => {
+    localStorage.setItem('shopflow_lang', v);
+    setLang(v);
+  };
+
+  return (
+    <Ctx.Provider value={{ lang, setLang: change, t }}>
+      {children}
+    </Ctx.Provider>
+  );
+}
+
+export const useI18n = () => useContext(Ctx);

@@ -1,69 +1,81 @@
-# ShopFlow POS — SaaS Starter
+# ShopFlow POS — Multi-Tenant SaaS Starter
 
-React + Vite frontend, Node.js + Express API, PostgreSQL, Prisma ORM.
-Bilingual dashboard (Myanmar / English), multi-tenant foundation.
+Modern bilingual (Myanmar / English) retail Point of Sale (POS) and SaaS management platform built with React, Vite, Node.js, Express, PostgreSQL, and Prisma ORM.
 
-## Requirements
-- Node.js 20+
-- PostgreSQL 15+
-- npm
+---
 
-## Quick start
-1. Create a PostgreSQL database, e.g. `shopflow`.
-2. Copy `server/.env.example` to `server/.env` and set `DATABASE_URL` and `JWT_SECRET`.
-3. Install and migrate:
-   ```bash
-   cd server
-   npm install
-   npx prisma generate
-   npx prisma migrate dev --name init
-   npm run db:seed
-   npm run dev
-   ```
-4. In another terminal:
-   ```bash
-   cd client
-   npm install
-   npm run dev
-   ```
-5. Open http://localhost:5173
+## ⚡ Quick Start
 
-Demo seed login:
-- Email: `owner@demo.shop`
-- Password: `ShopFlow123!`
+### 1. Database Setup
+Ensure PostgreSQL is running on port `5432` with a database named `shopflow` (e.g. via Docker):
+```bash
+docker run -d --name shopflow-postgres --restart unless-stopped -e POSTGRES_USER=postgres -e "POSTGRES_PASSWORD=zoranoe#126" -e POSTGRES_DB=shopflow -p 5432:5432 -v shopflow_pgdata:/var/lib/postgresql postgres:latest
+```
 
-The seed script creates a demo tenant and owner. Change all secrets and demo credentials before deployment.
+### 2. Backend Setup & Run
+```bash
+cd server
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run db:seed
+npm run dev
+# Backend running on http://localhost:4000
+```
 
-## Project structure
-- `client/` React + Vite UI
-- `server/` Express API, Prisma schema, auth, tenant middleware, feature routes
-- `server/prisma/` schema and seed data
+### 3. Frontend Setup & Run
+```bash
+cd client
+npm install
+npm run dev
+# Frontend running on http://localhost:5173
+```
 
-## Included starter modules
-Authentication, tenant registration/context, dashboard metrics, products, categories, customers,
-orders, inventory movements, reports, plans/subscriptions, admin overview, bilingual UI.
+---
 
-## Important production work before taking real payments
-- Configure HTTPS, secure cookies, rate limits, email verification and password reset.
-- Add automated tests and audit all tenant-scoped endpoints.
-- Integrate a real payment provider or documented manual payment verification flow.
-- Configure backups, restore drills, monitoring, logging and error reporting.
-- Review local tax, privacy, consumer-protection and data-retention requirements.
-- Use a dedicated production secret and disable demo seeding.
-- This is a functional starter foundation, not a certified accounting or tax product.
+## 🔑 Demo Login Credentials
 
-## API overview
-All authenticated shop endpoints require `Authorization: Bearer <token>`.
-- `POST /api/auth/register` create shop owner + tenant
-- `POST /api/auth/login`
-- `GET /api/auth/me`
-- `GET /api/dashboard`
-- `GET,POST /api/products`; `PATCH,DELETE /api/products/:id`
-- `GET,POST /api/customers`; `PATCH,DELETE /api/customers/:id`
-- `GET,POST /api/orders`; `PATCH /api/orders/:id/status`
-- `GET /api/inventory`
-- `GET /api/reports/summary`
-- `GET /api/subscriptions/plans`; `GET /api/subscriptions/current`
-- `GET /api/admin/overview` (platform admin only)
+### 1. Super Admin Panel (Platform Owner)
+- **Email**: `superadmin@shopflow.io`
+- **Password**: `ShopFlow123!`
+- **Route**: `http://localhost:5173/admin`
 
-All shop records are scoped by the authenticated user's active tenant. Never accept `tenantId` from the browser as authorization.
+### 2. Shop Admin Panel (Shop Owner)
+- **Email**: `owner@demo.shop`
+- **Password**: `ShopFlow123!`
+- **Route**: `http://localhost:5173/`
+
+---
+
+## 🌟 Key Features
+
+### A. Super Admin Panel (Platform Owner)
+- Global SaaS metrics: Total shops, active/suspended shops, platform revenue, total users, pending payment slips.
+- Shop management: inspect shop details, activate / suspend shops.
+- Subscription Plan tiers (Starter, Standard, Business) pricing and duration management.
+- Bank transfer slip inspection, one-click payment approve and reject.
+- User management and Super Admin privilege assignment.
+
+### B. Shop Admin Panel (Shop Owner & Staff)
+- **Dashboard**: Today's sales, month sales, total orders, catalog count, low stock alerts, 7-day visual sales trend, top selling products, recent orders, and real-time net profit estimation.
+- **POS Register**: Rapid cashier sales with product search, category filtering, cart management, discounts, delivery fees, payment methods (CASH, KBZPay, WavePay, etc.), and printable receipts.
+- **Product Management**: SKU validation, category assignment, cost price, retail price, stock tracking, and archive/delete.
+- **Order Management**: Order lifecycle tracking, status fulfillment, and automatic inventory restocking upon cancellation.
+- **Inventory Management**: Real-time stock audit, manual stock adjustments (IN/OUT), and movement history log.
+- **Financial Reports**: Sales report and true Profit & Loss (P&L) statements with Gross Profit, COGS, and Net Profit calculations.
+- **Operating Expenses**: Utility bills, packaging, and operating cost tracking.
+- **Branch Management**: Multi-location branch configuration.
+- **Staff Management**: Granular permission toggles (`pos`, `inventory`, `orders`, `customers`, `reports`, `manageStaff`).
+- **Subscription & Renewals**: Plan comparison, trial countdown, and payment slip submission.
+
+---
+
+## 📚 In-Depth AI & Developer Documentation
+
+All technical documentation, database schemas, and architectural patterns have been recorded in the [`knowledge/`](./knowledge/) folder:
+- [**knowledge/README.md**](./knowledge/README.md)
+- [**knowledge/system_architecture.md**](./knowledge/system_architecture.md)
+- [**knowledge/database_schema.md**](./knowledge/database_schema.md)
+- [**knowledge/api_documentation.md**](./knowledge/api_documentation.md)
+- [**knowledge/features_and_business_logic.md**](./knowledge/features_and_business_logic.md)
+- [**knowledge/setup_and_maintenance.md**](./knowledge/setup_and_maintenance.md)
